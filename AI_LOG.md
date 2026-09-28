@@ -249,3 +249,22 @@ Claude
 - 결정: 로딩 스켈레톤과 실제 ID의 높이가 달라 h2가 들썩거려, 높이를 상위 요소(h2)에 적용해 고정.
 - 검증: `npm run typecheck`, `npm test`(16개) 통과. 브라우저 화면 확인은 하지 않음 (들썩임 해소는 사용자가 직접 확인)
 - 직접 수정: `SlideDetailPanel` h2 — AI는 스켈레톤 span에만 `h-5`를 줘서 로딩 전후 높이가 달라짐. h2에 `h-5`를 주고 스켈레톤은 `h-full`로 바꿈. 에디터 포맷터로 파일 전체 따옴표·줄바꿈도 바뀜
+
+### fix(slide-detail): 제목 높이를 글자 줄 높이에 맞춰 h-6으로 수정
+
+- 커밋: `278ff0c` · 2026-09-28 14:41
+- 변경 파일: `src/components/SlideDetailPanel.tsx`
+- 프롬프트:
+  - 14:40 `수정햇고 따옴표 부분은 어떻게 처리하는게 좋다고 보니`
+  - 14:41 `그대로 진행해줘`
+- 결정: 없음
+- 검증: `npm run typecheck`, `npm test`(16개) 통과. 브라우저 화면 확인은 하지 않음
+- 직접 수정: `SlideDetailPanel` h2 높이 `h-5`(20px) → `h-6`(24px). 글자 한 줄 높이(`text-base`×`leading-normal` = 24px)보다 작아 ID가 h2 밖으로 4px 넘친다는 Claude 지적을 보고 직접 수정
+
+### style(global): Prettier 설정 추가와 코드 포맷 통일
+
+- 커밋: `4fe0f97` · 2026-09-28 14:42
+- 변경 파일: `.prettierrc`, `src/App.tsx`, `src/components/Button.test.tsx`, `src/components/SlideDetailPanel.tsx`, `src/components/SlideList.tsx`
+- 결정: 저장소에 Prettier 설정이 없어 에디터 기본값(큰따옴표·80자)으로 파일이 바뀌는 문제를 Claude 추천안대로 처리: 기존 스타일에 맞춘 `.prettierrc`(`singleQuote`, `printWidth: 120`) 추가, 포맷 변경은 기능 커밋과 분리. 버린 대안: 저장 시 자동 포맷만 끄기, 큰따옴표로 전체 통일
+- 검증: 적용 전 printWidth 120/150으로 파일별 변경 줄 수를 미리 비교(120: 4개 파일만 변경). `src/mocks/` 제외하고 포맷 후 `npm run typecheck`, `npm test`(16개), `npm run build` 통과. 새로 설치한 라이브러리 없음(Prettier 3.9.9는 이미 `node_modules`에 있음)
+- 직접 수정: 없음
