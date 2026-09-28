@@ -4,7 +4,8 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 import './index.css';
 
-const queryClient = new QueryClient();
+// 기본값(3회 재시도)은 간헐적 500을 조용히 복구해 에러 화면과 '다시 시도' 버튼이 사실상 보이지 않으므로 끈다.
+const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
 
 async function enableMocking() {
   const { worker } = await import('./mocks/browser');
