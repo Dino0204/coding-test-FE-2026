@@ -122,7 +122,10 @@ export default function App() {
             )}
           </QueryErrorResetBoundary>
         ) : (
-          <section aria-label="슬라이드 상세" className="rounded-md border border-border bg-surface p-12 text-center text-sm text-muted">
+          <section
+            aria-label="슬라이드 상세"
+            className="rounded-md border border-border bg-surface p-12 text-center text-sm text-muted"
+          >
             목록에서 슬라이드를 선택하세요.
           </section>
         )}

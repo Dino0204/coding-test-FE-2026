@@ -64,40 +64,46 @@ export function SlideList({
                   표시할 슬라이드가 없습니다.
                 </td>
               </tr>
-            ) : items
-              ? items.map((slide) => (
-                  <tr
-                    key={slide.id}
-                    aria-selected={slide.id === selectedId}
-                    onClick={() => onSelect?.(slide.id)}
-                    className="cursor-pointer border-b border-border last:border-b-0 hover:bg-bg aria-selected:bg-primary/10"
-                  >
-                    <td className="p-3">
-                      <img src={slide.thumbnailUrl} alt={`${slide.id} 썸네일`} className="size-12 rounded-md object-cover" />
+            ) : items ? (
+              items.map((slide) => (
+                <tr
+                  key={slide.id}
+                  aria-selected={slide.id === selectedId}
+                  onClick={() => onSelect?.(slide.id)}
+                  className="cursor-pointer border-b border-border last:border-b-0 hover:bg-bg aria-selected:bg-primary/10"
+                >
+                  <td className="p-3">
+                    <img
+                      src={slide.thumbnailUrl}
+                      alt={`${slide.id} 썸네일`}
+                      className="size-12 rounded-md object-cover"
+                    />
+                  </td>
+                  <td className="p-3 font-mono">
+                    {/* 행 클릭은 마우스용. Tab으로 이 버튼에 와서 Enter를 누르면 click이 행까지 올라가 선택된다. */}
+                    <button type="button" className="rounded-md focus-visible:outline-2 focus-visible:outline-primary">
+                      {slide.id}
+                    </button>
+                  </td>
+                  <td className="p-3">{maskPatientName(slide.patientName)}</td>
+                  <td className="p-3">{formatKst(slide.examinedAt)}</td>
+                  <td className="p-3">{STATUS_LABEL[slide.status]}</td>
+                </tr>
+              ))
+            ) : (
+              Array.from({ length: SKELETON_ROWS }, (_, i) => (
+                <tr key={i} data-testid="skeleton-row" className="border-b border-border last:border-b-0">
+                  <td className="p-3">
+                    <div className={`size-12 rounded-md bg-border ${errorMessage ? '' : 'animate-pulse'}`} />
+                  </td>
+                  {['w-24', 'w-12', 'w-32', 'w-12'].map((w, j) => (
+                    <td key={j} className="p-3">
+                      <div className={`h-4 rounded-md bg-border ${w} ${errorMessage ? '' : 'animate-pulse'}`} />
                     </td>
-                    <td className="p-3 font-mono">
-                      {/* 행 클릭은 마우스용. Tab으로 이 버튼에 와서 Enter를 누르면 click이 행까지 올라가 선택된다. */}
-                      <button type="button" className="rounded-md focus-visible:outline-2 focus-visible:outline-primary">
-                        {slide.id}
-                      </button>
-                    </td>
-                    <td className="p-3">{maskPatientName(slide.patientName)}</td>
-                    <td className="p-3">{formatKst(slide.examinedAt)}</td>
-                    <td className="p-3">{STATUS_LABEL[slide.status]}</td>
-                  </tr>
-                ))
-              : Array.from({ length: SKELETON_ROWS }, (_, i) => (
-                  <tr key={i} data-testid="skeleton-row" className="border-b border-border last:border-b-0">
-                    <td className="p-3">
-                      <div className={`size-12 rounded-md bg-border ${errorMessage ? '' : 'animate-pulse'}`} />
-                    </td>
-                    {['w-24', 'w-12', 'w-32', 'w-12'].map((w, j) => (
-                      <td key={j} className="p-3">
-                        <div className={`h-4 rounded-md bg-border ${w} ${errorMessage ? '' : 'animate-pulse'}`} />
-                      </td>
-                    ))}
-                  </tr>
-                ))}
+                  ))}
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
 
@@ -111,7 +117,10 @@ export function SlideList({
 
         {errorMessage && (
           <div className="absolute inset-0 flex items-center justify-center bg-surface/60">
-            <div role="alert" className="flex flex-col items-center gap-3 rounded-md border border-border bg-surface p-6 shadow">
+            <div
+              role="alert"
+              className="flex flex-col items-center gap-3 rounded-md border border-border bg-surface p-6 shadow"
+            >
               <p className="text-danger">{errorMessage}</p>
               <Button size="sm" onClick={onRetry}>
                 다시 시도
@@ -122,7 +131,12 @@ export function SlideList({
       </div>
 
       <nav aria-label="페이지 이동" className="flex items-center justify-center gap-3 border-t border-border p-3">
-        <Button variant="secondary" size="sm" disabled={navDisabled || page <= 1} onClick={() => onPageChange?.(page - 1)}>
+        <Button
+          variant="secondary"
+          size="sm"
+          disabled={navDisabled || page <= 1}
+          onClick={() => onPageChange?.(page - 1)}
+        >
           이전
         </Button>
         <span className="text-sm text-muted">
