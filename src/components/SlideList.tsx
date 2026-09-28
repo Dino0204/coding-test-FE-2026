@@ -37,7 +37,13 @@ export function SlideList({ items, total, page, isStale, errorMessage, onPageCha
             </tr>
           </thead>
           <tbody>
-            {items
+            {items?.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="p-12 text-center text-muted">
+                  표시할 슬라이드가 없습니다.
+                </td>
+              </tr>
+            ) : items
               ? items.map((slide) => (
                   <tr key={slide.id} className="border-b border-border last:border-b-0">
                     <td className="p-3">
