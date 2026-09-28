@@ -1,10 +1,11 @@
-import { Suspense, useState, useTransition } from 'react';
+import { Suspense, useEffect, useState, useTransition } from 'react';
 import { QueryErrorResetBoundary, useSuspenseQuery } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
 import { fetchSlide, fetchSlides } from './api/slides';
 import { SearchInput } from './components/SearchInput';
 import { SlideDetailPanel, type HeatmapSettings } from './components/SlideDetailPanel';
 import { SlideList } from './components/SlideList';
+import { parseUrlState, toUrlSearch } from './utils/urlState';
 
 type SlideListQueryProps = {
   q: string;
@@ -53,15 +54,23 @@ function SlideDetailQuery({ id, heatmap, onHeatmapChange }: SlideDetailQueryProp
 }
 
 export default function App() {
-  const [q, setQ] = useState('');
-  const [page, setPage] = useState(1);
-  const [selectedId, setSelectedId] = useState<string>();
+  // 새로고침·공유한 URL로 들어와도 같은 화면이 보이도록 첫 렌더링 때 URL에서 상태를 읽는다.
+  const [initial] = useState(() => parseUrlState(window.location.search));
+  const [q, setQ] = useState(initial.q);
+  const [page, setPage] = useState(initial.page);
+  const [selectedId, setSelectedId] = useState(initial.slide);
   // 슬라이드를 바꿔도 heatmap 설정을 유지하려고 패널이 아닌 App에 둔다. 기본값은 명세에 없어 임시로 정함.
   const [heatmap, setHeatmap] = useState<HeatmapSettings>({ visible: true, opacity: 50 });
   // transition 안에서 바뀐 state로 다시 suspend되면 React는 fallback 대신 이전 화면(이전 데이터)을 유지한다.
   const [isPagePending, startPageTransition] = useTransition();
   // 검색은 transition을 따로 둬서 '검색 중' 표시를 페이지 이동과 구분한다.
   const [isSearching, startSearchTransition] = useTransition();
+
+  // 상태가 바뀌면 URL에 반영한다. replaceState라 뒤로 가기 기록은 쌓이지 않는다.
+  useEffect(() => {
+    const search = toUrlSearch({ q, page, slide: selectedId });
+    window.history.replaceState(null, '', search || window.location.pathname);
+  }, [q, page, selectedId]);
 
   const changePage = (next: number) => startPageTransition(() => setPage(next));
   // 검색어가 바뀌면 결과 개수가 달라지므로 1페이지로 돌아간다. 같은 검색어(앞뒤 공백만 추가 등)면 무시한다.
@@ -77,7 +86,7 @@ export default function App() {
     <main className="mx-auto max-w-7xl p-6">
       <h1 className="mb-4 text-xl font-bold">슬라이드 분석 결과 뷰어</h1>
       <div className="mb-4">
-        <SearchInput onSearch={search} />
+        <SearchInput defaultValue={initial.q} onSearch={search} />
       </div>
       <div className="grid items-start gap-4 lg:grid-cols-[1fr_24rem]">
         <QueryErrorResetBoundary>
