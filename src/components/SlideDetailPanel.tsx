@@ -46,7 +46,7 @@ export function SlideDetailPanel({
       aria-busy={!slide && !errorMessage}
       className="relative rounded-md border border-border bg-surface p-4"
     >
-      <h2 className="mb-3 h-5 font-mono font-bold">
+      <h2 className="mb-3 h-6 font-mono font-bold">
         {slide ? (
           slide.id
         ) : (
