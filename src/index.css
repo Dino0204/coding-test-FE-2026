@@ -1,9 +1,25 @@
-:root {
-  font-family: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
-  color: #1f2328;
-  background: #f6f7f9;
-  line-height: 1.5;
+@import 'tailwindcss';
+
+/* 디자인 토큰: 여기서 정의한 값이 bg-primary, text-muted, rounded-md 같은 유틸리티 클래스가 된다 */
+@theme {
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+
+  --color-bg: #f6f7f9;
+  --color-surface: #ffffff;
+  --color-border: #d0d7de;
+  --color-text: #1f2328;
+  --color-muted: #656d76;
+
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+
+  --radius-md: 6px;
 }
-* { box-sizing: border-box; }
-body { margin: 0; }
-.app { max-width: 1280px; margin: 0 auto; padding: 24px; }
+
+@layer base {
+  body {
+    @apply bg-bg font-sans leading-normal text-text;
+  }
+}

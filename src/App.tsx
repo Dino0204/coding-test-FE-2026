@@ -7,7 +7,7 @@
  */
 export default function App() {
   return (
-    <main className="app">
+    <main className="mx-auto max-w-7xl p-6">
       <h1>슬라이드 분석 결과 뷰어</h1>
       <p>PROBLEM.md를 읽고 구현을 시작하세요.</p>
     </main>

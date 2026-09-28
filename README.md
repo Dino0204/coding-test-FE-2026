@@ -12,6 +12,7 @@ npm test
 
 - **Node.js 22.22 이상** (LTS 24 권장, `node -v` 로 확인). 버전이 낮으면 `npm install` 이 실패합니다.
 - 스택: React 19 + TypeScript + Vite, Mock API: MSW, 테스트: Vitest + Testing Library
+- 추가 라이브러리: Tailwind CSS v4 (`tailwindcss`, `@tailwindcss/vite`) — 익숙한 도구로 UI 개발 속도를 높이고, 디자인 토큰을 `src/index.css`의 `@theme`에 모아 관리하기 위해
 
 ## 폴더 구조
 
