@@ -21,7 +21,7 @@ Claude
 
 ## AI 답이 틀렸거나 의심스러웠던 순간 (있다면)
 
-- 유닛 테스트 스킬 생성을 요청했는데, Claude가 지시하지 않은 git worktree(`worktree-unit-test-skill`)를 만들어 그 브랜치에 커밋하고 원격에 push까지 했다. `main`에서 바로 커밋한다는 `git-commit` 스킬 규칙과도 어긋났다. worktree와 브랜치를 지우고 `main`에 다시 만들었으며, AGENTS.md에 "worktree를 만들지 않는다"는 규칙을 추가했다.
+- 유닛 테스트 스킬 생성을 요청했는데, Claude가 지시하지 않은 git worktree(`worktree-unit-test-skill`)를 만들어 그 브랜치에 커밋하고 원격에 push까지 함. `main`에서 바로 커밋한다는 `git-commit` 스킬 규칙과도 어긋남. worktree와 브랜치를 지우고 `main`에 다시 만들었으며, AGENTS.md에 "worktree를 만들지 않는다" 규칙을 추가함.
 
 ---
 
