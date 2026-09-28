@@ -69,8 +69,15 @@ export function SlideList({
                 <tr
                   key={slide.id}
                   aria-selected={slide.id === selectedId}
+                  // <tr>엔 네이티브 대화형 요소가 없어 tabIndex로 Tab 포커스를 주고, Enter/Space를 직접 click처럼 처리한다.
+                  tabIndex={0}
                   onClick={() => onSelect?.(slide.id)}
-                  className="cursor-pointer border-b border-border last:border-b-0 hover:bg-bg aria-selected:bg-primary/10"
+                  onKeyDown={(e) => {
+                    if (e.key !== 'Enter' && e.key !== ' ') return;
+                    e.preventDefault(); // Space의 페이지 스크롤 막기
+                    onSelect?.(slide.id);
+                  }}
+                  className="cursor-pointer border-b border-border last:border-b-0 hover:bg-bg aria-selected:bg-primary/10 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary"
                 >
                   <td className="p-3">
                     <img
@@ -79,12 +86,7 @@ export function SlideList({
                       className="size-12 rounded-md object-cover"
                     />
                   </td>
-                  <td className="p-3 font-mono">
-                    {/* 행 클릭은 마우스용. Tab으로 이 버튼에 와서 Enter를 누르면 click이 행까지 올라가 선택된다. */}
-                    <button type="button" className="rounded-md focus-visible:outline-2 focus-visible:outline-primary">
-                      {slide.id}
-                    </button>
-                  </td>
+                  <td className="p-3 font-mono">{slide.id}</td>
                   <td className="p-3">{maskPatientName(slide.patientName)}</td>
                   <td className="p-3">{formatKst(slide.examinedAt)}</td>
                   <td className="p-3">{STATUS_LABEL[slide.status]}</td>
