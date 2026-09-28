@@ -26,13 +26,15 @@ export default function App() {
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
   // transition 안에서 바뀐 state로 다시 suspend되면 React는 fallback 대신 이전 화면(이전 데이터)을 유지한다.
-  const [isPending, startTransition] = useTransition();
+  const [isPagePending, startPageTransition] = useTransition();
+  // 검색은 transition을 따로 둬서 '검색 중' 표시를 페이지 이동과 구분한다.
+  const [isSearching, startSearchTransition] = useTransition();
 
-  const changePage = (next: number) => startTransition(() => setPage(next));
+  const changePage = (next: number) => startPageTransition(() => setPage(next));
   // 검색어가 바뀌면 결과 개수가 달라지므로 1페이지로 돌아간다. 같은 검색어(앞뒤 공백만 추가 등)면 무시한다.
   const search = (next: string) => {
     if (next === q) return;
-    startTransition(() => {
+    startSearchTransition(() => {
       setQ(next);
       setPage(1);
     });
@@ -41,8 +43,12 @@ export default function App() {
   return (
     <main className="mx-auto max-w-7xl p-6">
       <h1 className="mb-4 text-xl font-bold">슬라이드 분석 결과 뷰어</h1>
-      <div className="mb-4">
+      <div className="mb-4 flex items-center gap-3">
         <SearchInput onSearch={search} />
+        {/* aria-live: 스크린 리더에도 검색 중임을 알린다 */}
+        <span role="status" aria-live="polite" className="text-sm text-muted">
+          {isSearching && '검색 중…'}
+        </span>
       </div>
       <QueryErrorResetBoundary>
         {({ reset }) => (
@@ -59,7 +65,7 @@ export default function App() {
             )}
           >
             <Suspense fallback={<SlideList page={page} />}>
-              <SlideListQuery q={q} page={page} isStale={isPending} onPageChange={changePage} />
+              <SlideListQuery q={q} page={page} isStale={isPagePending || isSearching} onPageChange={changePage} />
             </Suspense>
           </ErrorBoundary>
         )}
