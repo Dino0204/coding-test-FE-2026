@@ -63,7 +63,7 @@ export function SlideDetailPanel({ slide, errorMessage, onRetry, heatmap, onHeat
       )}
       <fieldset disabled={!heatmapUrl} className="mt-3 flex items-center gap-4 text-sm disabled:opacity-50">
         <legend className="sr-only">Heatmap 설정</legend>
-        <label className="flex items-center gap-2">
+        <label className="flex items-center gap-2 whitespace-nowrap">
           <input
             type="checkbox"
             checked={showHeatmap}
@@ -71,7 +71,7 @@ export function SlideDetailPanel({ slide, errorMessage, onRetry, heatmap, onHeat
           />
           Heatmap
         </label>
-        <label className="flex flex-1 items-center gap-2">
+        <label className="flex flex-1 items-center gap-2 whitespace-nowrap">
           투명도
           <input
             type="range"
