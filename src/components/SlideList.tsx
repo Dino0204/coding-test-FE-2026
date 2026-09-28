@@ -4,23 +4,29 @@ import { formatKst, maskPatientName, STATUS_LABEL } from '../utils/format';
 import { Button } from './Button';
 
 type SlideListProps = {
-  /** 로딩 중이거나 에러면 undefined */
+  /** 로딩 중이거나 에러면 undefined → 스켈레톤을 그린다 */
   items?: SlideSummary[];
   total?: number;
   page: number;
-  error: Error | null;
-  onPageChange: (page: number) => void;
-  onRetry: () => void;
+  /** 다음 데이터를 받는 동안 이전 데이터를 흐리게 보여 준다 */
+  isStale?: boolean;
+  errorMessage?: string;
+  onPageChange?: (page: number) => void;
+  onRetry?: () => void;
 };
 
-export function SlideList({ items, total, page, error, onPageChange, onRetry }: SlideListProps) {
-  // 에러면 응답이 없어 전체 개수를 모른다(totalPages undefined). 다시 시도 전까지는 페이지 이동을 모두 막는다.
+export function SlideList({ items, total, page, isStale, errorMessage, onPageChange, onRetry }: SlideListProps) {
+  // 로딩·에러면 응답이 없어 전체 개수를 모른다. 목록이 보일 때까지 페이지 이동을 모두 막는다.
   const totalPages = total === undefined ? undefined : Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const navDisabled = !items;
 
   return (
     <section className="rounded-md border border-border bg-surface">
       <div className="relative">
-        <table className="w-full text-left text-sm" aria-busy={!items && !error}>
+        <table
+          className={`w-full text-left text-sm transition-opacity ${isStale ? 'opacity-50' : ''}`}
+          aria-busy={isStale || (!items && !errorMessage)}
+        >
           <thead className="border-b border-border text-muted">
             <tr>
               <th className="p-3 font-medium">썸네일</th>
@@ -47,11 +53,11 @@ export function SlideList({ items, total, page, error, onPageChange, onRetry }: 
                 Array.from({ length: PAGE_SIZE }, (_, i) => (
                   <tr key={i} data-testid="skeleton-row" className="border-b border-border last:border-b-0">
                     <td className="p-3">
-                      <div className={`size-12 rounded-md bg-border ${error ? '' : 'animate-pulse'}`} />
+                      <div className={`size-12 rounded-md bg-border ${errorMessage ? '' : 'animate-pulse'}`} />
                     </td>
                     {['w-24', 'w-12', 'w-32', 'w-12'].map((w, j) => (
                       <td key={j} className="p-3">
-                        <div className={`h-4 rounded-md bg-border ${w} ${error ? '' : 'animate-pulse'}`} />
+                        <div className={`h-4 rounded-md bg-border ${w} ${errorMessage ? '' : 'animate-pulse'}`} />
                       </td>
                     ))}
                   </tr>
@@ -59,10 +65,10 @@ export function SlideList({ items, total, page, error, onPageChange, onRetry }: 
           </tbody>
         </table>
 
-        {error && (
+        {errorMessage && (
           <div className="absolute inset-0 flex items-center justify-center bg-surface/60">
             <div role="alert" className="flex flex-col items-center gap-3 rounded-md border border-border bg-surface p-6 shadow">
-              <p className="text-danger">{error.message}</p>
+              <p className="text-danger">{errorMessage}</p>
               <Button size="sm" onClick={onRetry}>
                 다시 시도
               </Button>
@@ -72,7 +78,7 @@ export function SlideList({ items, total, page, error, onPageChange, onRetry }: 
       </div>
 
       <nav aria-label="페이지 이동" className="flex items-center justify-center gap-3 border-t border-border p-3">
-        <Button variant="secondary" size="sm" disabled={!!error || page <= 1} onClick={() => onPageChange(page - 1)}>
+        <Button variant="secondary" size="sm" disabled={navDisabled || page <= 1} onClick={() => onPageChange?.(page - 1)}>
           이전
         </Button>
         <span className="text-sm text-muted">
@@ -81,8 +87,8 @@ export function SlideList({ items, total, page, error, onPageChange, onRetry }: 
         <Button
           variant="secondary"
           size="sm"
-          disabled={!!error || totalPages === undefined || page >= totalPages}
-          onClick={() => onPageChange(page + 1)}
+          disabled={navDisabled || totalPages === undefined || page >= totalPages}
+          onClick={() => onPageChange?.(page + 1)}
         >
           다음
         </Button>
