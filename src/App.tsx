@@ -1,8 +1,9 @@
 import { Suspense, useState, useTransition } from 'react';
 import { QueryErrorResetBoundary, useSuspenseQuery } from '@tanstack/react-query';
 import { ErrorBoundary } from 'react-error-boundary';
-import { fetchSlides } from './api/slides';
+import { fetchSlide, fetchSlides } from './api/slides';
 import { SearchInput } from './components/SearchInput';
+import { SlideDetailPanel } from './components/SlideDetailPanel';
 import { SlideList } from './components/SlideList';
 
 type SlideListQueryProps = {
@@ -11,21 +12,44 @@ type SlideListQueryProps = {
   isStale: boolean;
   isSearching: boolean;
   onPageChange: (page: number) => void;
+  selectedId?: string;
+  onSelect: (id: string) => void;
 };
 
 // useSuspenseQuery는 데이터가 올 때까지 가장 가까운 Suspense를 fallback으로 바꾸고,
 // 실패하면 가장 가까운 ErrorBoundary로 에러를 던진다. 그래서 여기서는 성공한 데이터만 다룬다.
-function SlideListQuery({ q, page, isStale, isSearching, onPageChange }: SlideListQueryProps) {
+function SlideListQuery({ q, page, isStale, isSearching, onPageChange, selectedId, onSelect }: SlideListQueryProps) {
   const { data } = useSuspenseQuery({
     queryKey: ['slides', q, page],
     queryFn: () => fetchSlides(page, q),
   });
-  return <SlideList items={data.items} total={data.total} page={page} isStale={isStale} isSearching={isSearching} onPageChange={onPageChange} />;
+  return (
+    <SlideList
+      items={data.items}
+      total={data.total}
+      page={page}
+      isStale={isStale}
+      isSearching={isSearching}
+      onPageChange={onPageChange}
+      selectedId={selectedId}
+      onSelect={onSelect}
+    />
+  );
+}
+
+// 목록과 같은 패턴: 성공한 데이터만 다루고, 로딩·에러는 바깥 Suspense·ErrorBoundary가 맡는다.
+function SlideDetailQuery({ id }: { id: string }) {
+  const { data } = useSuspenseQuery({
+    queryKey: ['slide', id],
+    queryFn: () => fetchSlide(id),
+  });
+  return <SlideDetailPanel slide={data} />;
 }
 
 export default function App() {
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
+  const [selectedId, setSelectedId] = useState<string>();
   // transition 안에서 바뀐 state로 다시 suspend되면 React는 fallback 대신 이전 화면(이전 데이터)을 유지한다.
   const [isPagePending, startPageTransition] = useTransition();
   // 검색은 transition을 따로 둬서 '검색 중' 표시를 페이지 이동과 구분한다.
@@ -47,32 +71,62 @@ export default function App() {
       <div className="mb-4">
         <SearchInput onSearch={search} />
       </div>
-      <QueryErrorResetBoundary>
-        {({ reset }) => (
-          <ErrorBoundary
-            // 다시 시도: 쿼리의 에러 상태를 지워야(reset) 다시 렌더링될 때 요청을 새로 보낸다.
-            onReset={reset}
-            resetKeys={[q, page]}
-            fallbackRender={({ error, resetErrorBoundary }) => (
-              <SlideList
-                page={page}
-                errorMessage={error instanceof Error ? error.message : '알 수 없는 오류'}
-                onRetry={resetErrorBoundary}
-              />
+      <div className="grid items-start gap-4 lg:grid-cols-[1fr_24rem]">
+        <QueryErrorResetBoundary>
+          {({ reset }) => (
+            <ErrorBoundary
+              // 다시 시도: 쿼리의 에러 상태를 지워야(reset) 다시 렌더링될 때 요청을 새로 보낸다.
+              onReset={reset}
+              resetKeys={[q, page]}
+              fallbackRender={({ error, resetErrorBoundary }) => (
+                <SlideList
+                  page={page}
+                  errorMessage={error instanceof Error ? error.message : '알 수 없는 오류'}
+                  onRetry={resetErrorBoundary}
+                />
+              )}
+            >
+              <Suspense fallback={<SlideList page={page} />}>
+                <SlideListQuery
+                  q={q}
+                  page={page}
+                  isStale={isPagePending}
+                  isSearching={isSearching}
+                  onPageChange={changePage}
+                  selectedId={selectedId}
+                  onSelect={setSelectedId}
+                />
+              </Suspense>
+            </ErrorBoundary>
+          )}
+        </QueryErrorResetBoundary>
+
+        {selectedId ? (
+          <QueryErrorResetBoundary>
+            {({ reset }) => (
+              <ErrorBoundary
+                onReset={reset}
+                // 다른 슬라이드를 고르면 이전 에러 화면을 지우고 새로 요청한다.
+                resetKeys={[selectedId]}
+                fallbackRender={({ error, resetErrorBoundary }) => (
+                  <SlideDetailPanel
+                    errorMessage={error instanceof Error ? error.message : '알 수 없는 오류'}
+                    onRetry={resetErrorBoundary}
+                  />
+                )}
+              >
+                <Suspense fallback={<SlideDetailPanel />}>
+                  <SlideDetailQuery id={selectedId} />
+                </Suspense>
+              </ErrorBoundary>
             )}
-          >
-            <Suspense fallback={<SlideList page={page} />}>
-              <SlideListQuery
-                q={q}
-                page={page}
-                isStale={isPagePending}
-                isSearching={isSearching}
-                onPageChange={changePage}
-              />
-            </Suspense>
-          </ErrorBoundary>
+          </QueryErrorResetBoundary>
+        ) : (
+          <section aria-label="슬라이드 상세" className="rounded-md border border-border bg-surface p-12 text-center text-sm text-muted">
+            목록에서 슬라이드를 선택하세요.
+          </section>
         )}
-      </QueryErrorResetBoundary>
+      </div>
     </main>
   );
 }

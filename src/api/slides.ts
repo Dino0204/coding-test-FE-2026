@@ -1,4 +1,4 @@
-import type { SlideListResponse } from './types';
+import type { SlideDetail, SlideListResponse } from './types';
 
 export const PAGE_SIZE = 20;
 
@@ -9,5 +9,13 @@ export async function fetchSlides(page: number, q = ''): Promise<SlideListRespon
   if (q) params.set('q', q);
   const res = await fetch(`/api/slides?${params}`);
   if (!res.ok) throw new Error(`슬라이드 목록 요청 실패 (${res.status})`);
+  return res.json();
+}
+
+// 404(없는 슬라이드)는 재시도해도 같은 결과라 문구를 따로 둔다.
+export async function fetchSlide(id: string): Promise<SlideDetail> {
+  const res = await fetch(`/api/slides/${encodeURIComponent(id)}`);
+  if (res.status === 404) throw new Error('존재하지 않는 슬라이드입니다.');
+  if (!res.ok) throw new Error(`슬라이드 상세 요청 실패 (${res.status})`);
   return res.json();
 }

@@ -18,6 +18,8 @@ type SlideListProps = {
   errorMessage?: string;
   onPageChange?: (page: number) => void;
   onRetry?: () => void;
+  selectedId?: string;
+  onSelect?: (id: string) => void;
 };
 
 export function SlideList({
@@ -29,6 +31,8 @@ export function SlideList({
   errorMessage,
   onPageChange,
   onRetry,
+  selectedId,
+  onSelect,
 }: SlideListProps) {
   // 검색 중에는 이전 검색어의 결과를 숨기고 로딩과 같은 스켈레톤을 그린다.
   const items = isSearching ? undefined : loadedItems;
@@ -62,11 +66,21 @@ export function SlideList({
               </tr>
             ) : items
               ? items.map((slide) => (
-                  <tr key={slide.id} className="border-b border-border last:border-b-0">
+                  <tr
+                    key={slide.id}
+                    aria-selected={slide.id === selectedId}
+                    onClick={() => onSelect?.(slide.id)}
+                    className="cursor-pointer border-b border-border last:border-b-0 hover:bg-bg aria-selected:bg-primary/10"
+                  >
                     <td className="p-3">
                       <img src={slide.thumbnailUrl} alt={`${slide.id} 썸네일`} className="size-12 rounded-md object-cover" />
                     </td>
-                    <td className="p-3 font-mono">{slide.id}</td>
+                    <td className="p-3 font-mono">
+                      {/* 행 클릭은 마우스용. Tab으로 이 버튼에 와서 Enter를 누르면 click이 행까지 올라가 선택된다. */}
+                      <button type="button" className="rounded-md focus-visible:outline-2 focus-visible:outline-primary">
+                        {slide.id}
+                      </button>
+                    </td>
                     <td className="p-3">{maskPatientName(slide.patientName)}</td>
                     <td className="p-3">{formatKst(slide.examinedAt)}</td>
                     <td className="p-3">{STATUS_LABEL[slide.status]}</td>
