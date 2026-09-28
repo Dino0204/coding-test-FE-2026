@@ -3,7 +3,7 @@ import { QueryErrorResetBoundary, useSuspenseQuery } from '@tanstack/react-query
 import { ErrorBoundary } from 'react-error-boundary';
 import { fetchSlide, fetchSlides } from './api/slides';
 import { SearchInput } from './components/SearchInput';
-import { SlideDetailPanel } from './components/SlideDetailPanel';
+import { SlideDetailPanel, type HeatmapSettings } from './components/SlideDetailPanel';
 import { SlideList } from './components/SlideList';
 
 type SlideListQueryProps = {
@@ -38,18 +38,26 @@ function SlideListQuery({ q, page, isStale, isSearching, onPageChange, selectedI
 }
 
 // 목록과 같은 패턴: 성공한 데이터만 다루고, 로딩·에러는 바깥 Suspense·ErrorBoundary가 맡는다.
-function SlideDetailQuery({ id }: { id: string }) {
+type SlideDetailQueryProps = {
+  id: string;
+  heatmap: HeatmapSettings;
+  onHeatmapChange: (heatmap: HeatmapSettings) => void;
+};
+
+function SlideDetailQuery({ id, heatmap, onHeatmapChange }: SlideDetailQueryProps) {
   const { data } = useSuspenseQuery({
     queryKey: ['slide', id],
     queryFn: () => fetchSlide(id),
   });
-  return <SlideDetailPanel slide={data} />;
+  return <SlideDetailPanel slide={data} heatmap={heatmap} onHeatmapChange={onHeatmapChange} />;
 }
 
 export default function App() {
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string>();
+  // 슬라이드를 바꿔도 heatmap 설정을 유지하려고 패널이 아닌 App에 둔다. 기본값은 명세에 없어 임시로 정함.
+  const [heatmap, setHeatmap] = useState<HeatmapSettings>({ visible: true, opacity: 50 });
   // transition 안에서 바뀐 state로 다시 suspend되면 React는 fallback 대신 이전 화면(이전 데이터)을 유지한다.
   const [isPagePending, startPageTransition] = useTransition();
   // 검색은 transition을 따로 둬서 '검색 중' 표시를 페이지 이동과 구분한다.
@@ -116,7 +124,7 @@ export default function App() {
                 )}
               >
                 <Suspense fallback={<SlideDetailPanel />}>
-                  <SlideDetailQuery id={selectedId} />
+                  <SlideDetailQuery id={selectedId} heatmap={heatmap} onHeatmapChange={setHeatmap} />
                 </Suspense>
               </ErrorBoundary>
             )}
