@@ -3,6 +3,9 @@ import type { SlideSummary } from '../api/types';
 import { formatKst, maskPatientName, STATUS_LABEL } from '../utils/format';
 import { Button } from './Button';
 
+// 로딩·검색·에러 때 그리는 스켈레톤 행 수. 한 페이지(20행) 높이는 너무 커서 줄였다.
+const SKELETON_ROWS = 5;
+
 type SlideListProps = {
   /** 로딩 중이거나 에러면 undefined → 스켈레톤을 그린다 */
   items?: SlideSummary[];
@@ -69,8 +72,7 @@ export function SlideList({
                     <td className="p-3">{STATUS_LABEL[slide.status]}</td>
                   </tr>
                 ))
-              : // 로딩·에러 모두 실제 목록과 같은 높이의 스켈레톤을 그려 레이아웃이 튀지 않게 한다.
-                Array.from({ length: PAGE_SIZE }, (_, i) => (
+              : Array.from({ length: SKELETON_ROWS }, (_, i) => (
                   <tr key={i} data-testid="skeleton-row" className="border-b border-border last:border-b-0">
                     <td className="p-3">
                       <div className={`size-12 rounded-md bg-border ${errorMessage ? '' : 'animate-pulse'}`} />
