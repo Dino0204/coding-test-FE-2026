@@ -65,7 +65,7 @@ export default function App() {
               <SlideListQuery
                 q={q}
                 page={page}
-                isStale={isPagePending || isSearching}
+                isStale={isPagePending}
                 isSearching={isSearching}
                 onPageChange={changePage}
               />
