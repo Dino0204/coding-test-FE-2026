@@ -1,15 +1,17 @@
-import type { SlideListResponse } from '../api/types';
+import { PAGE_SIZE } from '../api/slides';
+import type { SlideSummary } from '../api/types';
 import { formatKst, maskPatientName, STATUS_LABEL } from '../utils/format';
 import { Button } from './Button';
 
 type SlideListProps = {
-  data: SlideListResponse;
+  items: SlideSummary[];
+  total: number;
+  page: number;
   onPageChange: (page: number) => void;
 };
 
-export function SlideList({ data, onPageChange }: SlideListProps) {
-  const { items, page, pageSize, total } = data;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+export function SlideList({ items, total, page, onPageChange }: SlideListProps) {
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
     <section className="rounded-md border border-border bg-surface">

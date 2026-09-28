@@ -1,28 +1,34 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { fetchSlides } from './api/slides';
-import type { SlideListResponse } from './api/types';
+import { Button } from './components/Button';
 import { SlideList } from './components/SlideList';
 
 export default function App() {
+  // 현재 페이지의 기준은 이 state 하나다. 응답의 page를 기준으로 삼으면 요청 실패 시 둘이 어긋난다.
   const [page, setPage] = useState(1);
-  const [data, setData] = useState<SlideListResponse | null>(null);
-
-  useEffect(() => {
-    // 페이지를 빠르게 바꾸면 이전 요청이 늦게 도착해 최신 결과를 덮어쓸 수 있으므로 무시한다.
-    let ignore = false;
-    // ponytail: 로딩·에러 화면 없음. 실패 시 이전 화면 유지. 요구사항 2에서 처리
-    fetchSlides(page)
-      .then((res) => !ignore && setData(res))
-      .catch(() => {});
-    return () => {
-      ignore = true;
-    };
-  }, [page]);
+  // queryKey에 page를 넣어 페이지마다 따로 요청·캐시한다. 늦게 온 이전 페이지 응답이 현재 화면을 덮지 않는다.
+  const { data, error, isPending, refetch } = useQuery({
+    queryKey: ['slides', page],
+    queryFn: () => fetchSlides(page),
+    placeholderData: keepPreviousData, // 다음 페이지를 받는 동안 이전 목록을 유지한다
+  });
 
   return (
     <main className="mx-auto max-w-7xl p-6">
       <h1 className="mb-4 text-xl font-bold">슬라이드 분석 결과 뷰어</h1>
-      {data && <SlideList data={data} onPageChange={setPage} />}
+      {error ? (
+        <div role="alert" className="flex items-center gap-3">
+          <p className="text-danger">{error.message}</p>
+          <Button variant="secondary" size="sm" onClick={() => refetch()}>
+            다시 시도
+          </Button>
+        </div>
+      ) : isPending ? (
+        <p className="text-muted">불러오는 중…</p>
+      ) : (
+        <SlideList items={data.items} total={data.total} page={page} onPageChange={setPage} />
+      )}
     </main>
   );
 }
