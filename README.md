@@ -23,7 +23,6 @@ src/
 ├── api/types.ts        # API 타입 정의
 ├── mocks/              # Mock 서버 (수정 금지)
 ├── test/setup.ts       # 테스트 환경 설정 (MSW 연결됨)
-├── utils/example.*     # 테스트 작성 예시
 ├── App.tsx             # 여기서부터 구현
 └── main.tsx
 ```
