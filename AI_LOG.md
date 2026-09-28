@@ -354,3 +354,15 @@ Claude
 - 결정: 없음
 - 검증: `npm test`(23개), Prettier 검사 통과. 커서 모양은 브라우저에서 확인하지 않음
 - 직접 수정: 없음
+
+### chore(utils): 테스트 작성 예시 파일 삭제
+
+- 커밋: `0b29754` · 2026-09-28 15:36
+- 변경 파일: `README.md`, `src/utils/example.test.ts`, `src/utils/example.ts`
+- 프롬프트:
+  - 15:35 `없음 처리`
+  - 15:35 `테스트 커버리지가 어느 정도 됨?`
+  - 15:36 `example 파일 삭제 ㄱㄱ`
+- 결정: 
+- 검증: `grep -rn example src README.md`로 참조가 README 폴더 구조 한 줄뿐임을 확인, 삭제 후 `npm test` 3파일·21개 통과, `npm run typecheck` 에러 없음
+- 직접 수정: 
