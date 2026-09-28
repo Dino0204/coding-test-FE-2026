@@ -14,7 +14,7 @@ type SlideListProps = {
 };
 
 export function SlideList({ items, total, page, error, onPageChange, onRetry }: SlideListProps) {
-  // 에러면 응답이 없어 전체 개수를 모른다. 이때는 '다음'을 막고 '이전'으로만 돌아갈 수 있게 한다.
+  // 에러면 응답이 없어 전체 개수를 모른다(totalPages undefined). 다시 시도 전까지는 페이지 이동을 모두 막는다.
   const totalPages = total === undefined ? undefined : Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
@@ -72,7 +72,7 @@ export function SlideList({ items, total, page, error, onPageChange, onRetry }: 
       </div>
 
       <nav aria-label="페이지 이동" className="flex items-center justify-center gap-3 border-t border-border p-3">
-        <Button variant="secondary" size="sm" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
+        <Button variant="secondary" size="sm" disabled={!!error || page <= 1} onClick={() => onPageChange(page - 1)}>
           이전
         </Button>
         <span className="text-sm text-muted">
@@ -81,7 +81,7 @@ export function SlideList({ items, total, page, error, onPageChange, onRetry }: 
         <Button
           variant="secondary"
           size="sm"
-          disabled={totalPages === undefined || page >= totalPages}
+          disabled={!!error || totalPages === undefined || page >= totalPages}
           onClick={() => onPageChange(page + 1)}
         >
           다음
