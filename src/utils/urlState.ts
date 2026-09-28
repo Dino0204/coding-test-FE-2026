@@ -16,12 +16,11 @@ export function parseUrlState(search: string): UrlState {
   };
 }
 
-/** 상태 → `?q=...&page=...&slide=...`. 기본값(빈 검색어, 1페이지, 선택 없음)은 빼서 URL을 짧게 둔다. */
+/** 상태 → `?q=...&page=...&slide=...`. page는 1페이지여도 항상 쓰고, 빈 검색어와 선택 없음은 뺀다. */
 export function toUrlSearch({ q, page, slide }: UrlState) {
   const params = new URLSearchParams();
   if (q) params.set('q', q);
-  if (page > 1) params.set('page', String(page));
+  params.set('page', String(page));
   if (slide) params.set('slide', slide);
-  const search = params.toString();
-  return search ? `?${search}` : '';
+  return `?${params}`;
 }

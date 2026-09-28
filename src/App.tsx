@@ -66,10 +66,9 @@ export default function App() {
   // 검색은 transition을 따로 둬서 '검색 중' 표시를 페이지 이동과 구분한다.
   const [isSearching, startSearchTransition] = useTransition();
 
-  // 상태가 바뀌면 URL에 반영한다. replaceState라 뒤로 가기 기록은 쌓이지 않는다.
+  // 마운트 때와 상태가 바뀔 때 URL에 반영한다. replaceState라 뒤로 가기 기록은 쌓이지 않는다.
   useEffect(() => {
-    const search = toUrlSearch({ q, page, slide: selectedId });
-    window.history.replaceState(null, '', search || window.location.pathname);
+    window.history.replaceState(null, '', toUrlSearch({ q, page, slide: selectedId }));
   }, [q, page, selectedId]);
 
   const changePage = (next: number) => startPageTransition(() => setPage(next));

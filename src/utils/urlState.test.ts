@@ -19,8 +19,8 @@ describe('parseUrlState', () => {
 });
 
 describe('toUrlSearch', () => {
-  it('기본값은 URL에서 뺀다', () => {
-    expect(toUrlSearch({ q: '', page: 1 })).toBe('');
+  it('1페이지여도 page는 항상 쓰고, 빈 검색어와 선택 없음은 뺀다', () => {
+    expect(toUrlSearch({ q: '', page: 1 })).toBe('?page=1');
   });
 
   it('읽은 URL을 다시 쓰면 같은 상태가 된다', () => {
