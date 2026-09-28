@@ -73,6 +73,14 @@ export function SlideList({
                   tabIndex={0}
                   onClick={() => onSelect?.(slide.id)}
                   onKeyDown={(e) => {
+                    // ↑/↓는 포커스만 옆 행으로 옮긴다. 선택(상세 요청)은 Enter로 한다.
+                    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                      e.preventDefault(); // 방향키의 페이지 스크롤 막기
+                      const row = e.currentTarget;
+                      const next = e.key === 'ArrowDown' ? row.nextElementSibling : row.previousElementSibling;
+                      (next as HTMLElement | null)?.focus();
+                      return;
+                    }
                     if (e.key !== 'Enter' && e.key !== ' ') return;
                     e.preventDefault(); // Space의 페이지 스크롤 막기
                     onSelect?.(slide.id);
