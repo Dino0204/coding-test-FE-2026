@@ -9,17 +9,18 @@ type SlideListQueryProps = {
   q: string;
   page: number;
   isStale: boolean;
+  isSearching: boolean;
   onPageChange: (page: number) => void;
 };
 
 // useSuspenseQuery는 데이터가 올 때까지 가장 가까운 Suspense를 fallback으로 바꾸고,
 // 실패하면 가장 가까운 ErrorBoundary로 에러를 던진다. 그래서 여기서는 성공한 데이터만 다룬다.
-function SlideListQuery({ q, page, isStale, onPageChange }: SlideListQueryProps) {
+function SlideListQuery({ q, page, isStale, isSearching, onPageChange }: SlideListQueryProps) {
   const { data } = useSuspenseQuery({
     queryKey: ['slides', q, page],
     queryFn: () => fetchSlides(page, q),
   });
-  return <SlideList items={data.items} total={data.total} page={page} isStale={isStale} onPageChange={onPageChange} />;
+  return <SlideList items={data.items} total={data.total} page={page} isStale={isStale} isSearching={isSearching} onPageChange={onPageChange} />;
 }
 
 export default function App() {
@@ -43,12 +44,8 @@ export default function App() {
   return (
     <main className="mx-auto max-w-7xl p-6">
       <h1 className="mb-4 text-xl font-bold">슬라이드 분석 결과 뷰어</h1>
-      <div className="mb-4 flex items-center gap-3">
+      <div className="mb-4">
         <SearchInput onSearch={search} />
-        {/* aria-live: 스크린 리더에도 검색 중임을 알린다 */}
-        <span role="status" aria-live="polite" className="text-sm text-muted">
-          {isSearching && '검색 중…'}
-        </span>
       </div>
       <QueryErrorResetBoundary>
         {({ reset }) => (
@@ -65,7 +62,13 @@ export default function App() {
             )}
           >
             <Suspense fallback={<SlideList page={page} />}>
-              <SlideListQuery q={q} page={page} isStale={isPagePending || isSearching} onPageChange={changePage} />
+              <SlideListQuery
+                q={q}
+                page={page}
+                isStale={isPagePending || isSearching}
+                isSearching={isSearching}
+                onPageChange={changePage}
+              />
             </Suspense>
           </ErrorBoundary>
         )}

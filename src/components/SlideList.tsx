@@ -10,12 +10,14 @@ type SlideListProps = {
   page: number;
   /** 다음 데이터를 받는 동안 이전 데이터를 흐리게 보여 준다 */
   isStale?: boolean;
+  /** 검색 결과를 기다리는 중이면 목록 위에 '검색 중' 표시 */
+  isSearching?: boolean;
   errorMessage?: string;
   onPageChange?: (page: number) => void;
   onRetry?: () => void;
 };
 
-export function SlideList({ items, total, page, isStale, errorMessage, onPageChange, onRetry }: SlideListProps) {
+export function SlideList({ items, total, page, isStale, isSearching, errorMessage, onPageChange, onRetry }: SlideListProps) {
   // 로딩·에러면 응답이 없어 전체 개수를 모른다. 목록이 보일 때까지 페이지 이동을 모두 막는다.
   const totalPages = total === undefined ? undefined : Math.max(1, Math.ceil(total / PAGE_SIZE));
   const navDisabled = !items;
@@ -70,6 +72,14 @@ export function SlideList({ items, total, page, isStale, errorMessage, onPageCha
                 ))}
           </tbody>
         </table>
+
+        {isSearching && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <p role="status" className="rounded-md border border-border bg-surface px-4 py-2 text-sm shadow">
+              검색 중…
+            </p>
+          </div>
+        )}
 
         {errorMessage && (
           <div className="absolute inset-0 flex items-center justify-center bg-surface/60">
