@@ -1,4 +1,4 @@
-import { formatKst, maskPatientName, STATUS_LABEL } from './format';
+import { formatCellCount, formatKi67, formatKst, maskPatientName, STATUS_LABEL } from './format';
 
 describe('maskPatientName', () => {
   it.each([
@@ -27,5 +27,24 @@ describe('STATUS_LABEL', () => {
     ['failed', '실패'],
   ] as const)('%s → %s', (status, label) => {
     expect(STATUS_LABEL[status]).toBe(label);
+  });
+});
+
+describe('formatKi67', () => {
+  it('소수점 첫째 자리까지 %로 표시한다', () => {
+    expect(formatKi67(41.16)).toBe('41.2%');
+  });
+
+  it('분석 결과가 없으면(null) 분석 결과 없음으로 표시한다', () => {
+    expect(formatKi67(null)).toBe('분석 결과 없음');
+  });
+});
+
+describe('formatCellCount', () => {
+  it.each([
+    [12480, '12,480'],
+    [30321, '30,321'],
+  ])('%d → %s', (input, expected) => {
+    expect(formatCellCount(input)).toBe(expected);
   });
 });
