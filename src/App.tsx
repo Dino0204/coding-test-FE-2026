@@ -117,34 +117,37 @@ export default function App() {
           )}
         </QueryErrorResetBoundary>
 
-        {selectedId ? (
-          <QueryErrorResetBoundary>
-            {({ reset }) => (
-              <ErrorBoundary
-                onReset={reset}
-                // 다른 슬라이드를 고르면 이전 에러 화면을 지우고 새로 요청한다.
-                resetKeys={[selectedId]}
-                fallbackRender={({ error, resetErrorBoundary }) => (
-                  <SlideDetailPanel
-                    errorMessage={error instanceof Error ? error.message : '알 수 없는 오류'}
-                    onRetry={resetErrorBoundary}
-                  />
-                )}
-              >
-                <Suspense fallback={<SlideDetailPanel />}>
-                  <SlideDetailQuery id={selectedId} heatmap={heatmap} onHeatmapChange={setHeatmap} />
-                </Suspense>
-              </ErrorBoundary>
-            )}
-          </QueryErrorResetBoundary>
-        ) : (
-          <section
-            aria-label="슬라이드 상세"
-            className="rounded-md border border-border bg-surface p-12 text-center text-sm text-muted"
-          >
-            목록에서 슬라이드를 선택하세요.
-          </section>
-        )}
+        {/* 목록을 스크롤해도 상세가 화면에 남도록 고정한다. 한 열로 쌓이는 좁은 화면에선 목록을 가리므로 lg에서만. */}
+        <div className="lg:sticky lg:top-6">
+          {selectedId ? (
+            <QueryErrorResetBoundary>
+              {({ reset }) => (
+                <ErrorBoundary
+                  onReset={reset}
+                  // 다른 슬라이드를 고르면 이전 에러 화면을 지우고 새로 요청한다.
+                  resetKeys={[selectedId]}
+                  fallbackRender={({ error, resetErrorBoundary }) => (
+                    <SlideDetailPanel
+                      errorMessage={error instanceof Error ? error.message : '알 수 없는 오류'}
+                      onRetry={resetErrorBoundary}
+                    />
+                  )}
+                >
+                  <Suspense fallback={<SlideDetailPanel />}>
+                    <SlideDetailQuery id={selectedId} heatmap={heatmap} onHeatmapChange={setHeatmap} />
+                  </Suspense>
+                </ErrorBoundary>
+              )}
+            </QueryErrorResetBoundary>
+          ) : (
+            <section
+              aria-label="슬라이드 상세"
+              className="rounded-md border border-border bg-surface p-12 text-center text-sm text-muted"
+            >
+              목록에서 슬라이드를 선택하세요.
+            </section>
+          )}
+        </div>
       </div>
     </main>
   );
