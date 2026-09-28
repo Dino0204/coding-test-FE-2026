@@ -18,7 +18,8 @@
   "dependencies": {
     "@tanstack/react-query": "^5.104.0",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "react-error-boundary": "^6.1.6"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",

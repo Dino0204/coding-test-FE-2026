@@ -14,6 +14,7 @@ npm test
 - 스택: React 19 + TypeScript + Vite, Mock API: MSW, 테스트: Vitest + Testing Library
 - 추가 라이브러리: Tailwind CSS v4 (`tailwindcss`, `@tailwindcss/vite`) — 익숙한 도구로 UI 개발 속도를 높이고, 디자인 토큰을 `src/index.css`의 `@theme`에 모아 관리하기 위해
 - 추가 라이브러리: TanStack Query (`@tanstack/react-query`) — 목록·상세에서 반복될 로딩·에러·재시도, 늦게 도착한 응답 처리 같은 서버 상태 보일러플레이트를 줄이기 위해
+- 추가 라이브러리: react-error-boundary — Suspense(`useSuspenseQuery`)가 던지는 요청 에러를 받아 재시도 화면을 보여 주고, 검색어·페이지가 바뀌면(`resetKeys`) 에러 화면을 자동으로 해제하기 위해
 
 ## 폴더 구조
 
