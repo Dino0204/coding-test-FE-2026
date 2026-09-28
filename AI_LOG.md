@@ -343,3 +343,14 @@ Claude
 - 결정: 목록을 스크롤해도 상세 슬라이드가 따라오도록 sticky로 고정함.
 - 검증: `npm test`, `npm run typecheck`, `npm run build`, Prettier 통과. sticky 동작은 브라우저에서 확인하지 않음 (jsdom은 레이아웃을 계산하지 않음)
 - 직접 수정: 없음
+
+### style(global): 공통 버튼에 포인터 커서 적용
+
+- 커밋: `c64ea16` · 2026-09-28 15:35
+- 변경 파일: `src/components/Button.tsx`
+- 프롬프트:
+  - 15:33 `유닛 테스트 스킬 생성을 요청했는데, Claude가 지시하지 않은 git worktree(`worktree-unit-test-skill`)를 만들어 그 브랜치에 커밋하고 원격에 push까지 했다. `main`에서 바로 커밋한다는 `git-commit` 스킬 규칙과도 어긋났다. worktree와 브랜치를 지우고 `main`에 다시 만들었으며, AGENTS.md에 "worktree를 만들지 않는다"는 규칙을 추가했다. 이 부분 어투 맞춰`
+  - 15:33 `스티키, 목록 행단위만 결정 넣고 나머지는 없음 처리 ㄱㄱ`
+- 결정: 없음
+- 검증: `npm test`(23개), Prettier 검사 통과. 커서 모양은 브라우저에서 확인하지 않음
+- 직접 수정: 없음
